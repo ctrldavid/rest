@@ -16,3 +16,12 @@ npm install -g coffee-script
 
 git clone git@github.com:ctrldavid/rest.git
 
+apt-get install build-essential
+
+wget http://download.redis.io/releases/redis-2.6.16.tar.gz
+tar xzf redis-2.6.16.tar.gz
+cd redis-2.6.16
+make
+
+ln -s ~/tmp/redis-2.6.16/src/redis-server /usr/sbin/redis-server
+ln -s ~/tmp/redis-2.6.16/src/redis-cli /usr/sbin/redis-cli

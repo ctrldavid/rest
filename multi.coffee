@@ -5,8 +5,8 @@ server = http.createServer()
 
 children = []
 
-server.listen 80, ->
-  children = (cp.fork('child.coffee') for n in [0..3])  # 0..7 is 8 threads which seems to be best on my rmbp
+server.listen 4000, ->
+  children = (cp.fork('child.coffee') for n in [0..1])  # 0..7 is 8 threads which seems to be best on my rmbp
 
   for child, i in children
     do (child, i) ->
@@ -18,5 +18,5 @@ server.listen 80, ->
 setInterval ->
     console.log '--------------------------------------'
     child.send('log') for child in children
-, 3000
+, 60000
 
