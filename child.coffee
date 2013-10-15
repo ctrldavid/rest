@@ -35,7 +35,7 @@ app.use (req, res, next) ->
   next()
 
 app.use (req, res, next) ->
-  # console.log "#{req.method} #{req.url}"
+  console.log "#{req.method} #{req.url} from #{req.ip}"
   try
     next.future()()
   catch e
