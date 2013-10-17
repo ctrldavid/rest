@@ -9,6 +9,8 @@ client.getFuture = Future.wrap client.get, 1
 client.smembersFuture = Future.wrap client.smembers, 1
 client.saddFuture = Future.wrap client.sadd, 2
 client.mgetFuture = Future.wrap client.mget, 1
+client.delFuture = Future.wrap client.del, 1
+client.sremFuture = Future.wrap client.srem, 2
 
 client.on 'error', () ->
   console.error "REDIS ERROR:", arguments
@@ -81,6 +83,14 @@ app.put item, (req, res) ->
   res.end ''
 
 app.put collection, (req, res) -> res.status(405).end('Cannot PUT to a collection')
+
+app.delete item, (req, res) ->
+  col = req.path.match(/^.*\//)[0]
+  id = decodeURIComponent req.path.match(/[^\/]*$/)[0]
+
+  client.delFuture(req.path).wait()
+  client.sremFuture(col, id).wait()
+  res.end ''
 
 #app.listen 4001
 

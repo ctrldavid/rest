@@ -5,8 +5,8 @@ server = http.createServer()
 
 children = []
 
-server.listen 4000, ->
-  children = (cp.fork('child.coffee') for n in [0..0])  # 0..7 is 8 threads which seems to be best on my rmbp
+server.listen 4001, ->
+  children = (cp.fork('child.coffee') for n in [0..3])  # 0..7 is 8 threads which seems to be best on my rmbp
 
   for child, i in children
     do (child, i) ->
