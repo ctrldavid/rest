@@ -17,7 +17,7 @@ client.on 'error', () ->
 
 client.on 'end', () -> console.log 'REDIS END'
 
-client.select 8
+client.select 0
 
 # regexes for collection and item
 collection = /\/$/
