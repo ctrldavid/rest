@@ -3,6 +3,12 @@ express = require 'express'
 Future = require 'fibers/future'
 uuid = require 'node-uuid'
 
+Prefixes = {
+  json: 'json'
+  metadata: 'metadata'
+  mimetype: 'metadata-mimetype'
+}
+
 client = redis.createClient()
 client.setFuture = Future.wrap client.set, 2
 client.getFuture = Future.wrap client.get, 1
@@ -112,6 +118,34 @@ process.send 'ready'
 
 
 ###
+
+TODO:
+  Metadata stuff
+  PUT /path/item?metadata=field
+    Creates metadata:path/item hashmap if not already there
+    sets metadata:path/item field to whatever was in the body of PUT
+    tries to set metadata-mimetype:path/item field to the correct mimetype
+
+  GET /path/item?metadata
+    returns an array of the keys of metadata:path/item hashmap
+
+  GET /path/item?metadata=field
+    returns the raw contents of metadata:path/item field
+    with mimetype set to metadata-mimetype:path/item field
+
+  POST /path/?metadata=field
+    Same as PUT, but creates a new item in /path/ and returns its ID
+    so:
+      /path/id -> {id:id}
+      metadata:path/id field -> body of POST
+      metadata-mimetype:path/id field -> mimetype of POST
+
+  PATCH doesn't really work....
+  DELETE just delete the fields
+
+
+
+
 flushdb
 
 GET /path/value -> get
