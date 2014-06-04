@@ -43,7 +43,7 @@ app.use (req, res, next) ->
   next()
 
 app.use (req, res, next) ->
-  console.log "#{req.method} #{req.url} from #{req.ip}"
+  console.log "#{req.method} #{req.url} from #{req.ip} (x-real-ip: #{req.headers['x-real-ip']})"
   try
     next.future()()
   catch e
@@ -86,7 +86,7 @@ app.put item, (req, res) ->
   client.setFuture(req.path, str).wait()
   # add it to the collection's set
   client.saddFuture(col, id).wait()
-  res.end ''
+  res.end JSON.stringify {id}
 
 app.put collection, (req, res) -> res.status(405).end('Cannot PUT to a collection')
 
