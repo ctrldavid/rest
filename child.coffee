@@ -2,6 +2,7 @@ redis = require 'redis'
 express = require 'express'
 Future = require 'fibers/future'
 uuid = require 'node-uuid'
+# Buffer = require 'buffer'
 
 Prefixes = {
   json: 'json'
@@ -32,6 +33,7 @@ item = /[^\/]$/
 app = express()
 
 app.use express.bodyParser()
+
 sid = uuid.v4()
 served = 0
 app.use (req, res, next) ->
@@ -63,7 +65,8 @@ app.get collection, (req, res) ->
   else
     values = []
   #value = JSON.stringify ids.map (id) -> {id}
-
+  res.header 'content-type', 'application/json; charset=utf-8'
+  res.header 'content-length', Buffer.byteLength(JSON.stringify(values), 'utf8')
   res.end JSON.stringify values
 
 app.post item, (req, res) -> res.status(405).end('Must POST to a collection (url ending in /)')
