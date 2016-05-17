@@ -42,6 +42,8 @@ app.use (req, res, next) ->
   res.set "Access-Control-Allow-Origin", "*"
   res.set "Access-Control-Allow-Headers", "Content-Type"
   res.set "Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE"
+  res.set 'content-type', 'application/json; charset=utf-8'
+
   next()
 
 app.use (req, res, next) ->
@@ -65,8 +67,7 @@ app.get collection, (req, res) ->
   else
     values = []
   #value = JSON.stringify ids.map (id) -> {id}
-  res.header 'content-type', 'application/json; charset=utf-8'
-  res.header 'content-length', Buffer.byteLength(JSON.stringify(values), 'utf8')
+  res.set 'content-length', Buffer.byteLength(JSON.stringify(values), 'utf8')
   res.end JSON.stringify values
 
 app.post item, (req, res) -> res.status(405).end('Must POST to a collection (url ending in /)')
