@@ -2,6 +2,7 @@ redis = require 'redis'
 express = require 'express'
 Future = require 'fibers/future'
 uuid = require 'node-uuid'
+bodyParser = require 'body-parser'
 # Buffer = require 'buffer'
 
 Prefixes = {
@@ -32,11 +33,12 @@ item = /[^\/]$/
 
 app = express()
 
-app.use express.bodyParser()
+app.use bodyParser() #express.bodyParser()
 
 sid = uuid.v4()
 served = 0
 app.use (req, res, next) ->
+  console.log 'REQ: ', sid, new Date()
   served = served + 1
   res.set "X-Server", sid
   res.set "Access-Control-Allow-Origin", "*"
@@ -56,18 +58,22 @@ app.use (req, res, next) ->
 # Get item
 app.get item, (req, res) ->
   value = client.getFuture(req.path).wait()
-  res.end value
+  res.end value.toString()
 
 # Get collection
 app.get collection, (req, res) ->
-  ids = client.smembersFuture(req.path).wait()
+  ids = client.smembersFuture(req.path).wait()[0]
+  console.log 'ids', ids
   # mget freaks out if you send it an empty array.
   if ids.length > 0
-    values = client.mgetFuture(ids.map((id)->"#{req.path}#{encodeURIComponent id}")).wait().map (str) -> JSON.parse str
+    values = client.mgetFuture(ids.map((id)->"#{req.path}#{encodeURIComponent id}")).wait().map (str) -> str
+    # values = client.mgetFuture(ids.map((id)->"#{req.path}#{encodeURIComponent id}")).wait().map (str) -> JSON.parse str
   else
     values = []
   #value = JSON.stringify ids.map (id) -> {id}
+  console.log 'values', values
   res.set 'content-length', Buffer.byteLength(JSON.stringify(values), 'utf8')
+  console.log values
   res.end JSON.stringify values
 
 app.post item, (req, res) -> res.status(405).end('Must POST to a collection (url ending in /)')
@@ -113,7 +119,11 @@ server.on 'request', app
 
 process.on 'message', (m, handle) ->
   if m == 'handle'
-    server.listen handle
+    server.listen 5770 # handle
+    console.log 'got handle :('
+  else if m == 'server'
+    console.log 'got server', handle
+    handle.on 'request', app
   else if m == 'log'
     console.log "Served by #{sid}: #{served}"
 
